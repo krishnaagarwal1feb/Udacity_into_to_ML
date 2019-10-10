@@ -145,10 +145,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 #from sklearn.pipeline import Pipeline
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-#from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
 
@@ -209,7 +207,8 @@ print 'logistic regression :', compute(clf_logreg,features,labels)
 print 'gaussian nb :', compute(clf_gauss,features,labels)
 print 'decsion tree :', compute(clf_dectree,features,labels)
 
-#BASED ON ABOVE RESULTS WE CHOOSE SVC
+#BASED ON ABOVE RESULTS WE CHOOSE SVC or random forest or log reg , or gaussNB
+
 #%%fine tuning parameters of each classifier 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
 ### using our testing script. Check the tester.py script in the final project
@@ -217,6 +216,26 @@ print 'decsion tree :', compute(clf_dectree,features,labels)
 ### function. Because of the small size of the dataset, the script uses
 ### stratified shuffle split cross validation. For more info: 
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validationStratifiedShuffleSplit.html
+
+#SUPPOSE WE GOT GAUSSIAN NB AS SUITABLE MODEL
+#select k best removed from pipeline --
+from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
+k_range = [6, 8, 10, 12]
+PCA_range = [2, 3, 4, 5, 6]
+pipeline = make_pipeline( StandardScaler(), PCA(), GaussianNB())
+
+parameters_gnb = {
+        #'SKB__k' : k_range,
+        'pca__n_components' : PCA_range}
+
+cv = StratifiedShuffleSplit(n_splits = 20,test_size=0.3,random_state = 42)
+gs_gnb = GridSearchCV(pipeline, parameters_gnb, n_jobs = -1, cv=cv, scoring="f1")
+
+gs_gnb.fit(features, labels)
+clf = gs_gnb.best_estimator_
+#%%..
+print 'best estimator: ',gs_gnb.best_estimator_
+print 'best parameter: ',gs_gnb.best_params_
 #%% Example starting point. Try investigating other evaluation techniques!
 
 ### Task 6: Dump your classifier, dataset, and features_list so anyone can
