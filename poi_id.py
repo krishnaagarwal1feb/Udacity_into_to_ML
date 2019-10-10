@@ -199,6 +199,7 @@ def compute(clf,features, labels,num=100):
     return pre_mean, rec_mean, cf, classif_rep
 """
 #%% callig the compute to check which classifier suits my results better 
+"""
 print 'KMeans: ',compute(clf_kmeans, features, labels)
 print 'svc :' , compute(clf_svc,features,labels)
 print 'random forest : ',  compute(clf_rf,features,labels)
@@ -206,9 +207,9 @@ print 'random forest : ', compute(clf_rf,features,labels)
 print 'logistic regression :', compute(clf_logreg,features,labels)
 print 'gaussian nb :', compute(clf_gauss,features,labels)
 print 'decsion tree :', compute(clf_dectree,features,labels)
-
+"""
 #BASED ON ABOVE RESULTS WE CHOOSE SVC or random forest or log reg , or gaussNB
-
+#running tester.py for all these , we can evaluate our models and found out that GaussianNB works for us
 #%%fine tuning parameters of each classifier 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
 ### using our testing script. Check the tester.py script in the final project
@@ -222,13 +223,13 @@ print 'decsion tree :', compute(clf_dectree,features,labels)
 from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
 k_range = [6, 8, 10, 12]
 PCA_range = [2, 3, 4, 5, 6]
-pipeline = make_pipeline( StandardScaler(), PCA(), GaussianNB())
+pipeline = make_pipeline( SelectKBest(k=10), StandardScaler(), PCA(), GaussianNB())
 
 parameters_gnb = {
-        #'SKB__k' : k_range,
+        #'k__k' : k_range,
         'pca__n_components' : PCA_range}
 
-cv = StratifiedShuffleSplit(n_splits = 20,test_size=0.3,random_state = 42)
+cv = StratifiedShuffleSplit(n_splits = 20,random_state = 42)
 gs_gnb = GridSearchCV(pipeline, parameters_gnb, n_jobs = -1, cv=cv, scoring="f1")
 
 gs_gnb.fit(features, labels)
